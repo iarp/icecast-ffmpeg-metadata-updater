@@ -1,0 +1,8 @@
+services:
+  icecast-ffmpeg-metadata:
+    restart: unless-stopped
+    image: ghcr.io/iarp/icecast-ffmpeg-metadata-updater:latest
+    build:
+      context: .
+    env_file:
+      - ./.env
