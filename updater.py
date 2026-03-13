@@ -31,7 +31,7 @@ while True:
 
     icecast_status_data = resp_data['icestats']
 
-    for source in icecast_status_data['source']:
+    for source in icecast_status_data.get('source', []):
 
         # Only update streams with listeners and based on ffmpeg re-streaming.
         if not source['listeners'] or "ffmpeg" not in source['server_description']:
