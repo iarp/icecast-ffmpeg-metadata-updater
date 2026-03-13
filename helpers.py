@@ -1,9 +1,12 @@
 import base64
+import logging
 import urllib.error
 import urllib.parse
 import urllib.request
 
 import settings
+
+log = logging.getLogger(__name__)
 
 
 def update_icecast_metadata(server_url, username, password, mountpoint, title):
@@ -73,3 +76,21 @@ def get_hls_stream_title(stream_url):
 
 def get_clean_title(value):
     return " ".join(value.split())
+
+
+def title_contains_increase_refresh_interval(title):
+    for find, ri in settings.TITLE_CONTAINS_REFRESH_INTERVALS.items():
+        if find in title:
+            log.debug(f"Match found {find=} {title=}")
+            return ri
+
+
+def increase_refresh_interval_based_on_title(title, current_interval):
+    if ni := title_contains_increase_refresh_interval(title):
+        if ni != current_interval:
+            log.info(f"Increased refresh interval to {ni}")
+        return ni
+    else:
+        if current_interval != settings.REFRESH_INTERVAL:
+            log.debug(f"Setting refresh interval back to default {settings.REFRESH_INTERVAL}.")
+    return settings.REFRESH_INTERVAL

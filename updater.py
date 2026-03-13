@@ -8,11 +8,12 @@ import urllib.request
 import helpers, settings
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.getLevelName(settings.LOGGING_LEVEL),
     format='%(asctime)s [%(threadName)s] [%(name)s::%(funcName)s:%(lineno)s] %(levelname)s %(message)s'
 )
 
 log = logging.getLogger(__name__)
+REFRESH_INTERVAL = settings.REFRESH_INTERVAL
 
 attempted = False
 while True:
@@ -43,6 +44,11 @@ while True:
         new_title = helpers.get_clean_title(title_from_stream)
         log.debug(f"Cleaned {new_title=}")
 
+        REFRESH_INTERVAL = helpers.increase_refresh_interval_based_on_title(
+            title=new_title,
+            current_interval=REFRESH_INTERVAL,
+        )
+
         if source.get('title') == new_title:
             log.info(f'Stream title already matches {new_title=}')
             continue
@@ -60,5 +66,5 @@ while True:
             title=new_title,
         )
 
-    log.info(f"Waiting {settings.REFRESH_INTERVAL}s for next refresh.")
-    time.sleep(settings.REFRESH_INTERVAL)
+    log.info(f"Waiting {REFRESH_INTERVAL}s for next refresh.")
+    time.sleep(REFRESH_INTERVAL)
